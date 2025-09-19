@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Delícias Mineiras</title>
+
+  <style>
+    /* ======== ESTILO GERAL ======== */
+    body {
+      font-family: Calibri, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #ffffff;
+      color: #000;
+    }
+
+    /* ======== CABEÇALHO ======== */
+    header {
+      background-color: #c8102e;
+      color: #fff;
+      text-align: center;
+      padding: 15px;
+    }
+    header span {
+      font-size: 24px;
+      font-weight: bold;
+      color: #ffffff;
+    }
+
+    /* ======== BOTÕES DE CATEGORIA ======== */
+    .categoria-buttons {
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+      margin: 15px 10px;
+      gap: 10px;
+    }
+    .categoria-buttons button {
+      flex: 1;
+      min-width: 100px;
+      padding: 12px;
+      background-color: #fff;
+      color: #c8102e;
+      border: 2px solid #c8102e;
+      border-radius: 10px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .categoria-buttons button:hover {
+      background-color: #c8102e;
+      color: #fff;
+      transform: scale(1.05);
+    }
+
+    /* ======== PRODUTOS ======== */
+    .produtos {
+      display: flex;
+      flex-direction: column;
+      padding: 10px;
+      margin-bottom: 100px; /* espaço para rodapé */
+    }
+    .produto-card {
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      padding: 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
+      transition: transform 0.2s ease;
+      background-color: #fff;
+    }
+    .produto-card:hover {
+      transform: scale(1.02);
+    }
+    .produto-card img {
+      width: 90px;
+      height: 90px;
+      object-fit: cover;
+      border-radius: 10px;
+    }
+    .produto-info {
+      flex: 1;
+    }
+    .produto-info h3 {
+      margin: 0 0 5px 0;
+      font-size: 17px;
+      color: #c8102e;
+    }
+    .produto-info p {
+      margin: 0 0 5px 0;
+      font-size: 14px;
+      color: #555;
+    }
+    .produto-info .preco {
+      font-weight: bold;
+      margin-bottom: 5px;
+      color: #000;
+    }
+    .quantidade {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .quantidade button {
+      padding: 6px 12px;
+      font-size: 16px;
+      cursor: pointer;
+      border: 1px solid #c8102e;
+      background-color: #fff;
+      color: #c8102e;
+      border-radius: 6px;
+      transition: all 0.2s ease;
+    }
+    .quantidade button:hover {
+      background-color: #c8102e;
+      color: #fff;
+    }
+
+    /* ======== RODAPÉ CARRINHO ======== */
+    #carrinho {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      background-color: #c8102e;
+      color: #fff;
+      padding: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      box-shadow: 0 -2px 8px rgba(0,0,0,0.2);
+    }
+    #carrinho img {
+      height: 30px;
+    }
+    #carrinho button {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      font-weight: bold;
+      background-color: #fff;
+      color: #c8102e;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    #carrinho button img {
+      height: 22px;
+    }
+    #carrinho button:hover {
+      background-color: #e5e5e5;
+    }
+  </style>
+</head>
+<body>
+  <!-- CABEÇALHO -->
+  <header>
+    <span>Delícias Mineiras</span>
+  </header>
+
+  <!-- BOTÕES DE CATEGORIA -->
+  <div class="categoria-buttons">
+    <button onclick="filtrarCategoria('PaoDeQueijo')">Pão de Queijo</button>
+    <button onclick="filtrarCategoria('Doces')">Doces</button>
+    <button onclick="filtrarCategoria('Queijos')">Queijos</button>
+  </div>
+
+  <!-- PRODUTOS -->
+  <div class="produtos" id="produtos-container"></div>
+
+  <!-- RODAPÉ CARRINHO -->
+  <div id="carrinho">
+    <img src="images/carrinho.png" alt="Carrinho">
+    <span id="total-itens">0 itens</span> |
+    <span id="total-valor">R$ 0,00</span>
+    <button onclick="enviarPedido()">
+      <img src="images/whatsapp.png" alt="WhatsApp"> Enviar pedido
+    </button>
+  </div>
+
+  <script>
+    /* ====== LISTA DE PRODUTOS ====== */
+    const produtos = [
+      { nome: "Pão de queijo 500g", descricao: "Meio quilo de pão de queijo mineiro", preco: 20.00, imagem: "images/pao-de-queijo-500g.jpg", categoria: "PaoDeQueijo" },
+      { nome: "Pão de queijo 1kg", descricao: "Pacote de 1kg de pão de queijo mineiro", preco: 40.00, imagem: "images/pao-de-queijo-1kg.jpg", categoria: "PaoDeQueijo" },
+      { nome: "Doce de leite", descricao: "Delicioso Doce de leite em pote de 650g", preco: 30.00, imagem: "images/doce-de-leite.jpg", categoria: "Doces" },
+      { nome: "Doce de leite 10%", descricao: "Doce de leite com apenas 10% de açucar em pote de 650g", preco: 30.00, imagem: "images/doce-de-leite.jpg", categoria: "Doces" },
+      { nome: "Cocada Cremosa", descricao: "Deliciosa Cocada cremosa em pote 650g", preco: 30.00, imagem: "images/cocada.jpg", categoria: "Doces" },
+      { nome: "Cocada Cremosa com geléia", descricao: "Geléia de morango ou maracujá", preco: 30.00, imagem: "images/gerais.jpg", categoria: "Doces" },
+      { nome: "Doce de Nata", descricao: "Delicioso Doce de nata em pote de 650g", preco: 30.00, imagem: "images/gerais.jpg", categoria: "Doces" },
+      { nome: "Doce de Leite com geléia", descricao: "Geléia de morango ou maracujá", preco: 30.00, imagem: "images/gerais.jpg", categoria: "Doces" },
+      { nome: "Doce de Leite com ameixa", descricao: "Delicioso Doce de leite com ameixa em pote de 650g", preco: 30.00, imagem: "images/gerais.jpg", categoria: "Doces" },
+      { nome: "Doce de Leite com chocolate", descricao: "Delicioso Doce de leite com chocolate em pote de 650g", preco: 30.00, imagem: "images/gerais.jpg", categoria: "Doces" },
+      { nome: "Mais opções:", descricao: "Para mais opções, realizar um pedido deste item", preco: 30.00, imagem: "images/gerais.jpg", categoria: "Doces" },
+      { nome: "Queijo nozinho", descricao: "Queijinho fresco de Minas (250g)", preco: 50.00, imagem: "images/nozinho.jpg", categoria: "Queijos" }
+    ];
+
+    let carrinho = [];
+
+    /* ====== MOSTRAR PRODUTOS ====== */
+    function filtrarCategoria(categoria) {
+      const container = document.getElementById('produtos-container');
+      container.innerHTML = '';
+      const filtrados = produtos.filter(p => p.categoria === categoria);
+      filtrados.forEach(produto => {
+        const card = document.createElement('div');
+        card.className = 'produto-card';
+        card.innerHTML = `
+          <img src="${produto.imagem}" alt="${produto.nome}">
+          <div class="produto-info">
+            <h3>${produto.nome}</h3>
+            <p>${produto.descricao}</p>
+            <p class="preco">R$ ${produto.preco.toFixed(2)}</p>
+            <div class="quantidade">
+              <button onclick="alterarQuantidade('${produto.nome}', -1)">-</button>
+              <span id="quant-${produto.nome}">0</span>
+              <button onclick="alterarQuantidade('${produto.nome}', 1)">+</button>
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    /* ====== ALTERAR QUANTIDADE ====== */
+    function alterarQuantidade(nomeProduto, valor) {
+      let item = carrinho.find(p => p.nome === nomeProduto);
+      if (!item) {
+        if (valor > 0) {
+          item = { nome: nomeProduto, quantidade: 0, preco: produtos.find(p => p.nome === nomeProduto).preco };
+          carrinho.push(item);
+        } else return;
+      }
+      item.quantidade += valor;
+      if (item.quantidade < 0) item.quantidade = 0;
+      document.getElementById(`quant-${nomeProduto}`).innerText = item.quantidade;
+      atualizarCarrinho();
+    }
+
+    /* ====== ATUALIZAR CARRINHO ====== */
+    function atualizarCarrinho() {
+      let totalItens = 0;
+      let totalValor = 0;
+      carrinho.forEach(item => {
+        totalItens += item.quantidade;
+        totalValor += item.quantidade * item.preco;
+      });
+      document.getElementById("total-itens").innerText = `${totalItens} itens`;
+      document.getElementById("total-valor").innerText = `R$ ${totalValor.toFixed(2)}`;
+    }
+
+    /* ====== ENVIAR PEDIDO WHATSAPP ====== */
+    function enviarPedido() {
+      if (carrinho.length === 0 || carrinho.every(item => item.quantidade === 0)) {
+        alert("Selecione pelo menos um produto!");
+        return;
+      }
+
+      let mensagem = "🍴 Pedido - Delícias Mineiras\n\n";
+      let total = 0;
+      carrinho.forEach(item => {
+        if (item.quantidade > 0) {
+          mensagem += `${item.quantidade}x ${item.nome} - R$ ${item.preco.toFixed(2)} cada\n`;
+          total += item.quantidade * item.preco;
+        }
+      });
+      mensagem += `\n💰 Total: R$ ${total.toFixed(2)}\n\nCliente: [Digite seu nome]`;
+
+      const numeroWhats = "5519997154823";
+      const url = `https://wa.me/${numeroWhats}?text=${encodeURIComponent(mensagem)}`;
+      window.open(url, "_blank");
+    }
+  </script>
+</body>
+</html>
