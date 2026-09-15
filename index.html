@@ -3,284 +3,623 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Delícias Mineiras</title>
+  <title>Uai João! · Sabores de Minas</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
   <style>
-    /* ======== ESTILO GERAL ======== */
-    body {
-      font-family: Calibri, sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #ffffff;
-      color: #000;
+    :root{
+      --vinho:#8c1c2b;
+      --vinho-esc:#6d1421;
+      --creme:#fbf6ee;
+      --creme-2:#f3e9da;
+      --dourado:#c98a3a;
+      --verde:#3d6b3a;
+      --carvao:#2a221e;
+      --cinza:#7a6f66;
+      --borda:#e7dccb;
+
+      /* escala tipográfica (base 16, razão ~1.2 minor third) */
+      --t-xs:12.5px;
+      --t-sm:13.5px;
+      --t-base:15px;
+      --t-md:17px;
+      --t-lg:21px;
+      --t-xl:26px;
+      --t-brand:38px;
+
+      --tap:44px; /* alvo mínimo de toque */
     }
+
+    *{box-sizing:border-box;}
+    html{scroll-behavior:smooth;}
+    @media (prefers-reduced-motion:reduce){
+      *{animation:none !important; transition:none !important; scroll-behavior:auto !important;}
+    }
+    body{
+      font-family:'Inter',system-ui,sans-serif;
+      margin:0;padding:0;
+      background:var(--creme);
+      color:var(--carvao);
+      font-size:var(--t-base);
+      line-height:1.5;
+      -webkit-font-smoothing:antialiased;
+      text-rendering:optimizeLegibility;
+    }
+
+    /* números alinhados e proporcionais para preços */
+    .num{font-variant-numeric:tabular-nums; font-feature-settings:"tnum" 1;}
+
+    :focus-visible{outline:2.5px solid var(--dourado); outline-offset:2px; border-radius:6px;}
 
     /* ======== CABEÇALHO ======== */
-    header {
-      background-color: #c8102e;
-      color: #fff;
-      text-align: center;
-      padding: 20px;
+    header{
+      background:var(--vinho);
+      color:#fff;
+      text-align:center;
+      padding:32px 20px 28px;
+      position:relative;
     }
-    header span {
-      font-size: 32px;
-      font-weight: bold;
-      color: #ffffff;
+    header::after{
+      content:"";
+      position:absolute;left:0;right:0;bottom:-1px;height:14px;
+      background:radial-gradient(circle at 12px -2px, var(--creme) 12px, transparent 13px) repeat-x;
+      background-size:24px 14px;
+    }
+    header .brand{
+      font-family:'Fraunces',serif;
+      font-size:var(--t-brand);
+      font-weight:700;
+      line-height:1.02;
+      letter-spacing:-.015em;
+      margin:0;
+    }
+    header .brand .uai{
+      font-style:italic;
+      color:var(--dourado);
+    }
+    header .tagline{
+      font-size:var(--t-sm);
+      opacity:.9;
+      margin-top:9px;
+      font-weight:400;
+      max-width:34ch;
+      margin-left:auto;margin-right:auto;
     }
 
-    /* ======== BOTÕES DE CATEGORIA ======== */
-    .categoria-buttons {
-      display: flex;
-      justify-content: space-around;
-      flex-wrap: wrap;
-      margin: 15px 10px;
-      gap: 10px;
+    /* ======== FILTRO DE CATEGORIA ======== */
+    .categoria-buttons{
+      display:flex;
+      justify-content:center;
+      flex-wrap:wrap;
+      gap:8px;
+      padding:18px 12px 8px;
+      position:sticky;top:0;z-index:20;
+      background:linear-gradient(var(--creme) 76%, rgba(251,246,238,0));
     }
-    .categoria-buttons button {
-      flex: 1;
-      min-width: 100px;
-      padding: 12px;
-      background-color: #fff;
-      color: #c8102e;
-      border: 2px solid #c8102e;
-      border-radius: 10px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: all 0.2s ease;
+    .categoria-buttons button{
+      min-height:40px;
+      padding:0 18px;
+      background:#fff;
+      color:var(--vinho);
+      border:1.5px solid var(--borda);
+      border-radius:999px;
+      font-weight:600;
+      font-size:var(--t-sm);
+      font-family:inherit;
+      cursor:pointer;
+      transition:color .16s ease, background .16s ease, border-color .16s ease;
     }
-    .categoria-buttons button:hover {
-      background-color: #c8102e;
-      color: #fff;
-      transform: scale(1.05);
+    .categoria-buttons button:hover{border-color:var(--vinho);}
+    .categoria-buttons button.ativo{
+      background:var(--vinho);color:#fff;border-color:var(--vinho);
     }
 
     /* ======== PRODUTOS ======== */
-    .produtos {
-      display: flex;
-      flex-direction: column;
-      padding: 10px;
-      margin-bottom: 100px; /* espaço para rodapé */
+    .produtos{
+      max-width:600px;
+      margin:0 auto;
+      padding:6px 14px 168px;
     }
-    .produto-card {
-      border: 1px solid #ddd;
-      border-radius: 12px;
-      margin-bottom: 12px;
-      padding: 12px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
-      transition: transform 0.2s ease;
-      background-color: #fff;
+    .cat-titulo{
+      font-family:'Fraunces',serif;
+      font-size:var(--t-lg);
+      font-weight:600;
+      color:var(--vinho-esc);
+      letter-spacing:-.01em;
+      margin:26px 2px 12px;
+      display:flex;align-items:baseline;gap:10px;
     }
-    .produto-card:hover {
-      transform: scale(1.02);
-    }
-    .produto-card img {
-      width: 90px;
-      height: 90px;
-      object-fit: cover;
-      border-radius: 10px;
-    }
-    .produto-info {
-      flex: 1;
-    }
-    .produto-info h3 {
-      margin: 0 0 5px 0;
-      font-size: 17px;
-      color: #c8102e;
-    }
-    .produto-info p {
-      margin: 0 0 5px 0;
-      font-size: 14px;
-      color: #555;
-    }
-    .produto-info .preco {
-      font-weight: bold;
-      margin-bottom: 5px;
-      color: #000;
-    }
-    .quantidade {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-    .quantidade button {
-      padding: 6px 12px;
-      font-size: 16px;
-      cursor: pointer;
-      border: 1px solid #c8102e;
-      background-color: #fff;
-      color: #c8102e;
-      border-radius: 6px;
-      transition: all 0.2s ease;
-    }
-    .quantidade button:hover {
-      background-color: #c8102e;
-      color: #fff;
+    .cat-titulo::after{
+      content:"";flex:1;height:1px;
+      background:var(--borda);
     }
 
-    /* ======== RODAPÉ CARRINHO ======== */
-    #carrinho {
-      position: fixed;
-      bottom: 0;
-      width: 100%;
-      background-color: #c8102e;
-      color: #fff;
-      padding: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      flex-wrap: wrap;
-      box-shadow: 0 -2px 8px rgba(0,0,0,0.2);
+    .produto-card{
+      background:#fff;
+      border:1px solid var(--borda);
+      border-radius:16px;
+      margin-bottom:11px;
+      padding:13px;
+      display:flex;
+      align-items:center;
+      gap:14px;
+      transition:border-color .18s ease, background .18s ease;
     }
-    #carrinho img {
-      height: 30px;
+    .thumb, .thumb-fallback{
+      width:80px;height:80px;flex-shrink:0;
+      border-radius:12px;
     }
-    #carrinho button {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 16px;
-      font-weight: bold;
-      background-color: #fff;
-      color: #c8102e;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.2s ease;
+    .thumb{object-fit:cover; background:var(--creme-2);}
+    .thumb-fallback{
+      background:var(--creme-2);
+      display:flex;align-items:center;justify-content:center;
+      font-size:32px;
     }
-    #carrinho button img {
-      height: 22px;
+
+    .produto-info{flex:1;min-width:0;}
+    .produto-info h3{
+      margin:0 0 3px;
+      font-size:var(--t-md);
+      font-weight:600;
+      line-height:1.25;
+      letter-spacing:-.005em;
+      color:var(--carvao);
     }
-    #carrinho button:hover {
-      background-color: #e5e5e5;
+    .produto-info .desc{
+      margin:0;
+      font-size:var(--t-sm);
+      color:var(--cinza);
+      line-height:1.4;
     }
+    .linha-preco{
+      display:flex;align-items:center;justify-content:space-between;gap:12px;
+      margin-top:10px;
+    }
+    /* PREÇO — agora Inter, forte, tabular. Sem serifa. */
+    .preco{
+      font-family:'Inter',sans-serif;
+      font-weight:700;
+      font-size:var(--t-md);
+      color:var(--carvao);
+      letter-spacing:-.01em;
+    }
+    .preco .cifra{
+      font-size:var(--t-xs);
+      font-weight:600;
+      color:var(--cinza);
+      margin-right:2px;
+      vertical-align:1px;
+    }
+
+    .quantidade{display:flex;align-items:center;gap:4px;}
+    .quantidade button{
+      width:var(--tap);height:var(--tap);
+      font-size:22px;line-height:1;font-weight:400;
+      cursor:pointer;
+      border:1.5px solid var(--borda);
+      background:#fff;color:var(--vinho);
+      border-radius:11px;
+      display:flex;align-items:center;justify-content:center;
+      transition:background .14s ease, color .14s ease, border-color .14s ease, transform .1s ease;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .quantidade button:hover{background:var(--vinho);color:#fff;border-color:var(--vinho);}
+    .quantidade button:active{transform:scale(.92);}
+    .quantidade .valor-q{
+      min-width:28px;text-align:center;
+      font-weight:600;font-size:var(--t-md);
+      font-variant-numeric:tabular-nums;
+    }
+    .produto-card.tem-item{border-color:var(--dourado);background:#fffdf8;}
+
+    /* ======== CARRINHO ======== */
+    #carrinho{
+      position:fixed;bottom:0;left:0;right:0;z-index:30;
+      background:var(--vinho);
+      color:#fff;
+      padding:13px 14px calc(13px + env(safe-area-inset-bottom));
+      box-shadow:0 -8px 26px rgba(60,20,20,.26);
+    }
+    #carrinho .inner{max-width:600px;margin:0 auto;}
+    #carrinho .resumo{
+      display:flex;align-items:baseline;justify-content:space-between;
+      margin-bottom:9px;
+    }
+    #carrinho .resumo .itens{font-size:var(--t-sm);opacity:.92;}
+    #carrinho .resumo .valor{
+      font-family:'Inter',sans-serif;
+      font-weight:700;font-size:var(--t-lg);
+      letter-spacing:-.01em;
+    }
+    /* animação sutil só quando o total muda */
+    .valor.pulou{animation:pulo .28s ease;}
+    @keyframes pulo{0%{transform:scale(1);}40%{transform:scale(1.09);}100%{transform:scale(1);}}
+
+    #campo-nome{
+      display:block;width:100%;
+      min-height:var(--tap);
+      padding:11px 15px;border:1.5px solid transparent;border-radius:11px;
+      font-size:var(--t-base);font-family:inherit;
+      color:var(--carvao);margin-bottom:9px;
+    }
+    #campo-nome::placeholder{color:#b0a29a;}
+    #campo-nome:focus-visible{outline:none;border-color:var(--dourado);}
+
+    #btn-enviar{
+      display:flex;align-items:center;justify-content:center;gap:10px;
+      width:100%;min-height:52px;
+      font-weight:700;font-size:var(--t-md);font-family:inherit;
+      background:#fff;color:var(--vinho);
+      border:none;border-radius:13px;cursor:pointer;
+      transition:background .15s ease, transform .1s ease;
+      -webkit-tap-highlight-color:transparent;
+    }
+    #btn-enviar:hover{background:var(--creme-2);}
+    #btn-enviar:active{transform:scale(.99);}
+    #btn-enviar .wa{width:22px;height:22px;flex-shrink:0;fill:#25D366;}
+
+    .rodape-info{
+      text-align:center;font-size:var(--t-xs);color:var(--cinza);
+      padding:4px 16px 22px;
+    }
+
+    /* ======== MODAL PIX ======== */
+    #modal-pix{
+      position:fixed;inset:0;z-index:50;
+      background:rgba(42,34,30,.55);
+      display:none;
+      align-items:flex-end;justify-content:center;
+      -webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);
+    }
+    #modal-pix.aberto{display:flex;}
+    .pix-caixa{
+      background:var(--creme);
+      width:100%;max-width:440px;
+      border-radius:22px 22px 0 0;
+      padding:24px 22px calc(24px + env(safe-area-inset-bottom));
+      text-align:center;
+      animation:sobe .26s ease;
+      max-height:92vh;overflow-y:auto;
+    }
+    @keyframes sobe{from{transform:translateY(100%);}to{transform:translateY(0);}}
+    @media (prefers-reduced-motion:reduce){.pix-caixa{animation:none;}}
+    .pix-titulo{
+      font-family:'Fraunces',serif;font-size:var(--t-xl);font-weight:600;
+      color:var(--vinho-esc);margin:0 0 4px;letter-spacing:-.01em;
+    }
+    .pix-sub{font-size:var(--t-sm);color:var(--cinza);margin:0 0 18px;}
+    .pix-valor{
+      font-weight:700;font-size:32px;color:var(--carvao);
+      font-variant-numeric:tabular-nums;margin:0 0 18px;letter-spacing:-.01em;
+    }
+    .pix-valor .cifra{font-size:var(--t-md);color:var(--cinza);font-weight:600;margin-right:3px;}
+    #qrcode{
+      display:inline-block;padding:14px;background:#fff;
+      border-radius:16px;border:1px solid var(--borda);margin-bottom:6px;
+    }
+    #qrcode img,#qrcode canvas{display:block;}
+    .pix-copiar{
+      display:flex;align-items:center;gap:8px;justify-content:center;
+      width:100%;min-height:var(--tap);margin:14px 0 0;
+      padding:12px;border:1.5px solid var(--borda);border-radius:12px;
+      background:#fff;color:var(--carvao);font-family:inherit;
+      font-size:var(--t-sm);font-weight:600;cursor:pointer;
+      transition:border-color .15s ease, background .15s ease;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .pix-copiar:hover{border-color:var(--dourado);}
+    .pix-copiar.copiado{border-color:var(--verde);color:var(--verde);background:#f2f8f1;}
+    .pix-passos{
+      text-align:left;font-size:var(--t-sm);color:var(--cinza);
+      line-height:1.55;margin:18px 2px;padding-left:18px;
+    }
+    .pix-passos li{margin-bottom:4px;}
+    .pix-confirmar{
+      display:flex;align-items:center;justify-content:center;gap:9px;
+      width:100%;min-height:52px;margin-top:6px;
+      background:var(--vinho);color:#fff;border:none;border-radius:13px;
+      font-family:inherit;font-size:var(--t-md);font-weight:700;cursor:pointer;
+      transition:background .15s ease, transform .1s ease;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .pix-confirmar:hover{background:var(--vinho-esc);}
+    .pix-confirmar:active{transform:scale(.99);}
+    .pix-confirmar .wa{width:20px;height:20px;fill:#fff;flex-shrink:0;}
+    .pix-fechar{
+      background:none;border:none;color:var(--cinza);
+      font-family:inherit;font-size:var(--t-sm);cursor:pointer;
+      margin-top:12px;padding:6px;text-decoration:underline;
+    }
+    .pix-alt{font-size:var(--t-xs);color:var(--cinza);margin:14px 0 0;line-height:1.5;}
   </style>
 </head>
 <body>
-  <!-- CABEÇALHO -->
+
   <header>
-    <span>Delícias Mineiras</span>
+    <h1 class="brand"><span class="uai">Uai</span> João!</h1>
+    <p class="tagline">Pão de queijo, doces e queijos de Minas</p>
   </header>
 
-  <!-- BOTÕES DE CATEGORIA -->
-  <div class="categoria-buttons">
-    <button onclick="filtrarCategoria('PaoDeQueijo')">Pão de Queijo</button>
-    <button onclick="filtrarCategoria('Doces')">Doces</button>
-    <button onclick="filtrarCategoria('Queijos')">Queijos</button>
+  <nav class="categoria-buttons" id="categoria-buttons" aria-label="Categorias">
+    <button class="ativo" onclick="filtrarCategoria('Todos', this)">Todos</button>
+    <button onclick="filtrarCategoria('PaoDeQueijo', this)">Pão de Queijo</button>
+    <button onclick="filtrarCategoria('Doces', this)">Doces</button>
+    <button onclick="filtrarCategoria('Queijos', this)">Queijos</button>
+  </nav>
+
+  <main class="produtos" id="produtos-container"></main>
+
+  <p class="rodape-info">Uai João! · feito com carinho em Minas Gerais 🧀</p>
+
+  <!-- MODAL PIX -->
+  <div id="modal-pix" role="dialog" aria-modal="true" aria-labelledby="pix-titulo">
+    <div class="pix-caixa">
+      <h2 class="pix-titulo" id="pix-titulo">Pague com Pix 💚</h2>
+      <p class="pix-sub">Escaneie o código com o app do seu banco</p>
+      <p class="pix-valor num"><span class="cifra">R$</span><span id="pix-valor-num">0,00</span></p>
+      <div id="qrcode"></div>
+      <button class="pix-copiar" id="btn-copiar-pix" onclick="copiarPix()">
+        <span id="txt-copiar">📋 Copiar código Pix</span>
+      </button>
+      <ol class="pix-passos">
+        <li>Abra o app do seu banco e escolha <strong>Pix</strong></li>
+        <li>Escaneie o QR ou cole o código copiado</li>
+        <li>Confira o valor e conclua o pagamento</li>
+        <li>Clique no botão abaixo para me avisar 👇</li>
+      </ol>
+      <button class="pix-confirmar" onclick="confirmarPagamento()">
+        <svg class="wa" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.5 14.4c-.3-.15-1.77-.87-2.04-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.48-.9-.8-1.5-1.77-1.67-2.07-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.51-.17-.01-.37-.01-.57-.01-.2 0-.52.07-.8.37-.27.3-1.05 1.02-1.05 2.5 0 1.47 1.07 2.9 1.22 3.1.15.2 2.1 3.2 5.08 4.49.71.31 1.26.49 1.69.62.71.23 1.36.2 1.87.12.57-.08 1.77-.72 2.02-1.42.25-.7.25-1.3.17-1.42-.07-.12-.27-.2-.57-.35zM12 2C6.48 2 2 6.48 2 12c0 1.77.46 3.43 1.27 4.87L2 22l5.25-1.38A9.94 9.94 0 0 0 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2z"/></svg>
+        Paguei — enviar pedido
+      </button>
+      <p class="pix-alt">Prefere pagar na entrega? Sem problema — é só clicar abaixo.</p>
+      <button class="pix-fechar" onclick="enviarSemPagar()">Enviar pedido e combinar pagamento</button>
+      <br>
+      <button class="pix-fechar" onclick="fecharPix()">Voltar</button>
+    </div>
   </div>
 
-  <!-- PRODUTOS -->
-  <div class="produtos" id="produtos-container"></div>
-
-  <!-- RODAPÉ CARRINHO -->
   <div id="carrinho">
-    <img src="images/carrinho.png" alt="Carrinho">
-    <span id="total-itens">0 itens</span> |
-    <span id="total-valor">R$ 0,00</span>
-    <button onclick="enviarPedido()">
-      <img src="images/whatsapp.png" alt="WhatsApp"> Enviar pedido
-    </button>
+    <div class="inner">
+      <div class="resumo">
+        <span class="itens" id="total-itens">Nenhum item ainda</span>
+        <span class="valor num" id="total-valor">R$ 0,00</span>
+      </div>
+      <input id="campo-nome" type="text" autocomplete="name"
+             placeholder="Seu nome (para eu saber de quem é o pedido)">
+      <button id="btn-enviar" onclick="enviarPedido()">
+        <svg class="wa" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M17.5 14.4c-.3-.15-1.77-.87-2.04-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.48-.9-.8-1.5-1.77-1.67-2.07-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.51-.17-.01-.37-.01-.57-.01-.2 0-.52.07-.8.37-.27.3-1.05 1.02-1.05 2.5 0 1.47 1.07 2.9 1.22 3.1.15.2 2.1 3.2 5.08 4.49.71.31 1.26.49 1.69.62.71.23 1.36.2 1.87.12.57-.08 1.77-.72 2.02-1.42.25-.7.25-1.3.17-1.42-.07-.12-.27-.2-.57-.35zM12 2C6.48 2 2 6.48 2 12c0 1.77.46 3.43 1.27 4.87L2 22l5.25-1.38A9.94 9.94 0 0 0 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2z"/></svg>
+        Enviar pedido pelo WhatsApp
+      </button>
+    </div>
   </div>
 
   <script>
-    /* ====== LISTA DE PRODUTOS ====== */
     const produtos = [
-      { nome: "Pão de queijo 500g", descricao: "Meio quilo de pão de queijo mineiro", preco: 20.00, imagem: "images/pao-de-queijo-500g.jpg", categoria: "PaoDeQueijo" },
-      { nome: "Pão de queijo 1kg", descricao: "Pacote de 1kg de pão de queijo mineiro", preco: 40.00, imagem: "images/pao-de-queijo-1kg.jpg", categoria: "PaoDeQueijo" },
-      { nome: "Doce de leite", descricao: "Delicioso Doce de leite em pote de 650g", preco: 30.00, imagem: "images/doce-de-leite.jpg", categoria: "Doces" },
-      { nome: "Doce de leite 10%", descricao: "Doce de leite com apenas 10% de açucar em pote de 650g", preco: 30.00, imagem: "images/doce-de-leite.jpg", categoria: "Doces" },
-      { nome: "Cocada Cremosa", descricao: "Deliciosa Cocada cremosa em pote 650g", preco: 30.00, imagem: "images/cocada.jpg", categoria: "Doces" },
-      { nome: "Cocada Cremosa com geléia", descricao: "Geléia de morango ou maracujá", preco: 30.00, imagem: "images/gerais.jpg", categoria: "Doces" },
-      { nome: "Doce de Nata", descricao: "Delicioso Doce de nata em pote de 650g", preco: 30.00, imagem: "images/gerais.jpg", categoria: "Doces" },
-      { nome: "Doce de Leite com geléia", descricao: "Geléia de morango ou maracujá", preco: 30.00, imagem: "images/gerais.jpg", categoria: "Doces" },
-      { nome: "Doce de Leite com ameixa", descricao: "Delicioso Doce de leite com ameixa em pote de 650g", preco: 30.00, imagem: "images/gerais.jpg", categoria: "Doces" },
-      { nome: "Doce de Leite com chocolate", descricao: "Delicioso Doce de leite com chocolate em pote de 650g", preco: 30.00, imagem: "images/gerais.jpg", categoria: "Doces" },
-      { nome: "Doce de Abóbora", descricao: "Delicioso Doce de abóbora em pote de 650g", preco: 30.00, imagem: "images/abobora.jpg", categoria: "Doces" },
-      { nome: "Mais opções:", descricao: "Para mais opções, realizar um pedido deste item", preco: 30.00, imagem: "images/gerais.jpg", categoria: "Doces" },
-      { nome: "Queijo Minas", descricao: "Queijinho fresco de Minas", preco: 40.00, imagem: "images/queijo.jpg", categoria: "Queijos" },
-      { nome: "Nozinho", descricao: "Nozinho fresco de Minas (1kg)", preco: 60.00, imagem: "images/nozinho.jpg", categoria: "Queijos" },
-      { nome: "Palitinho", descricao: "Palintinho fresco de Minas (1kg)", preco: 60.00, imagem: "images/palitinho.jpg", categoria: "Queijos" },
-      { nome: "Manteiga caseira", descricao: "Deliciosa manteiga caseira", preco: 20.00, imagem: "images/manteiga.jpg", categoria: "Queijos" }
+      { nome:"Pão de queijo 500g", descricao:"Meio quilo de pão de queijo mineiro", preco:20.00, imagem:"images/pao-de-queijo-1kg.jpg", categoria:"PaoDeQueijo", icone:"🧀" },
+      { nome:"Pão de queijo - Palitinho 500g", descricao:"Meio quilo de pão de queijo mineiro em formato de palito", preco:20.00, imagem:"images/Palito.jpg", categoria:"PaoDeQueijo", icone:"🧀" },
+      { nome:"Pão de queijo 1kg", descricao:"Pacote de 1kg de pão de queijo mineiro", preco:40.00, imagem:"images/pao-de-queijo-1kg.jpg", categoria:"PaoDeQueijo", icone:"🧀" },
+      { nome:"Pão de queijo - Palitinho 1Kg", descricao:"Pacote de 1kg de pão de queijo mineiro em formato de palito", preco:40.00, imagem:"images/Palito.jpg", categoria:"PaoDeQueijo", icone:"🧀" },
+
+      { nome:"Doce de leite", descricao:"Doce de leite em pote de 650g", preco:30.00, imagem:"images/doce-de-leite.jpg", categoria:"Doces", icone:"🍯" },
+      { nome:"Doce de leite 10% açúcar", descricao:"Doce de leite com apenas 10% de açúcar · pote 650g", preco:30.00, imagem:"images/semacucar.jpg", categoria:"Doces", icone:"🍯" },
+      { nome:"Cocada cremosa", descricao:"Cocada cremosa em pote de 650g", preco:30.00, imagem:"images/cocada.jpg", categoria:"Doces", icone:"🥥" },
+      { nome:"Doce de abóbora", descricao:"Doce de abóbora em pote de 650g", preco:30.00, imagem:"images/abobora.jpg", categoria:"Doces", icone:"🎃" },
+      { nome:"Outros Doces", descricao:"Quer um sabor que não está na lista? Peça este item que combino com você", preco:30.00, imagem:"images/gerais.jpg", categoria:"Doces", icone:"✨" },
+
+      { nome:"Queijo Minas", descricao:"Queijinho fresco de Minas", preco:40.00, imagem:"images/queijo.jpg", categoria:"Queijos", icone:"🧀" },
+      { nome:"Nozinho", descricao:"Nozinho fresco de Minas (1kg)", preco:60.00, imagem:"images/nozinho.jpg", categoria:"Queijos", icone:"🧀" },
+      { nome:"Palitinho", descricao:"Palitinho fresco de Minas (1kg)", preco:60.00, imagem:"images/palitinho.jpg", categoria:"Queijos", icone:"🧀" },
+      { nome:"Manteiga caseira", descricao:"Manteiga caseira", preco:25.00, imagem:"images/manteiga.jpg", categoria:"Queijos", icone:"🧈" }
     ];
 
-    let carrinho = [];
+    const rotulos = { PaoDeQueijo:"Pão de Queijo", Doces:"Doces", Queijos:"Queijos" };
+    const ordemCat = ["PaoDeQueijo","Doces","Queijos"];
+    let quantidades = {};
 
-    /* ====== MOSTRAR PRODUTOS ====== */
-    function filtrarCategoria(categoria) {
-      const container = document.getElementById('produtos-container');
-      container.innerHTML = '';
-      const filtrados = produtos.filter(p => p.categoria === categoria);
-      filtrados.forEach(produto => {
-        const card = document.createElement('div');
-        card.className = 'produto-card';
-        card.innerHTML = `
-          <img src="${produto.imagem}" alt="${produto.nome}">
-          <div class="produto-info">
-            <h3>${produto.nome}</h3>
-            <p>${produto.descricao}</p>
-            <p class="preco">R$ ${produto.preco.toFixed(2)}</p>
-            <div class="quantidade">
-              <button onclick="alterarQuantidade('${produto.nome}', -1)">-</button>
-              <span id="quant-${produto.nome}">0</span>
-              <button onclick="alterarQuantidade('${produto.nome}', 1)">+</button>
-            </div>
-          </div>
-        `;
-        container.appendChild(card);
-      });
+    function precoHTML(v){
+      return `<span class="cifra">R$</span>${v.toFixed(2).replace('.',',')}`;
     }
 
-    /* ====== ALTERAR QUANTIDADE ====== */
-    function alterarQuantidade(nomeProduto, valor) {
-      let item = carrinho.find(p => p.nome === nomeProduto);
-      if (!item) {
-        if (valor > 0) {
-          item = { nome: nomeProduto, quantidade: 0, preco: produtos.find(p => p.nome === nomeProduto).preco };
-          carrinho.push(item);
-        } else return;
-      }
-      item.quantidade += valor;
-      if (item.quantidade < 0) item.quantidade = 0;
-      document.getElementById(`quant-${nomeProduto}`).innerText = item.quantidade;
+    function cardHTML(produto, i){
+      const q = quantidades[i] || 0;
+      const midia = produto.imagem
+        ? `<img class="thumb" src="${produto.imagem}" alt="${produto.nome}" loading="lazy" onerror="this.outerHTML='<div class=&quot;thumb-fallback&quot; role=&quot;img&quot; aria-label=&quot;${produto.nome}&quot;>${produto.icone}</div>'">`
+        : `<div class="thumb-fallback" role="img" aria-label="${produto.nome}">${produto.icone}</div>`;
+      return `
+        <div class="produto-card ${q>0?'tem-item':''}" id="card-${i}">
+          ${midia}
+          <div class="produto-info">
+            <h3>${produto.nome}</h3>
+            <p class="desc">${produto.descricao}</p>
+            <div class="linha-preco">
+              <span class="preco num">${precoHTML(produto.preco)}</span>
+              <div class="quantidade">
+                <button aria-label="Diminuir ${produto.nome}" onclick="alterarQuantidade(${i}, -1)">–</button>
+                <span class="valor-q" id="quant-${i}">${q}</span>
+                <button aria-label="Adicionar ${produto.nome}" onclick="alterarQuantidade(${i}, 1)">+</button>
+              </div>
+            </div>
+          </div>
+        </div>`;
+    }
+
+    function filtrarCategoria(categoria, botao){
+      document.querySelectorAll('.categoria-buttons button')
+        .forEach(b => b.classList.remove('ativo'));
+      if(botao) botao.classList.add('ativo');
+
+      const container = document.getElementById('produtos-container');
+      let html = '';
+      const cats = categoria === 'Todos' ? ordemCat : [categoria];
+      cats.forEach(cat => {
+        const itens = produtos.map((p,i)=>({p,i})).filter(o => o.p.categoria === cat);
+        if(!itens.length) return;
+        if(categoria === 'Todos') html += `<h2 class="cat-titulo">${rotulos[cat]}</h2>`;
+        itens.forEach(o => html += cardHTML(o.p, o.i));
+      });
+      container.innerHTML = html;
+    }
+
+    function alterarQuantidade(i, valor){
+      quantidades[i] = Math.max(0, (quantidades[i] || 0) + valor);
+      const span = document.getElementById(`quant-${i}`);
+      if(span) span.innerText = quantidades[i];
+      const card = document.getElementById(`card-${i}`);
+      if(card) card.classList.toggle('tem-item', quantidades[i] > 0);
       atualizarCarrinho();
     }
 
-    /* ====== ATUALIZAR CARRINHO ====== */
-    function atualizarCarrinho() {
-      let totalItens = 0;
-      let totalValor = 0;
-      carrinho.forEach(item => {
-        totalItens += item.quantidade;
-        totalValor += item.quantidade * item.preco;
+    function atualizarCarrinho(){
+      let totalItens = 0, totalValor = 0;
+      produtos.forEach((p,i)=>{
+        const q = quantidades[i] || 0;
+        totalItens += q; totalValor += q * p.preco;
       });
-      document.getElementById("total-itens").innerText = `${totalItens} itens`;
-      document.getElementById("total-valor").innerText = `R$ ${totalValor.toFixed(2)}`;
+      const elItens = document.getElementById("total-itens");
+      elItens.innerText = totalItens === 0 ? "Nenhum item ainda"
+                        : totalItens === 1 ? "1 item" : `${totalItens} itens`;
+
+      const elValor = document.getElementById("total-valor");
+      elValor.innerText = `R$ ${totalValor.toFixed(2).replace('.',',')}`;
+      elValor.classList.remove('pulou');
+      void elValor.offsetWidth; // reinicia a animação
+      if(totalItens > 0) elValor.classList.add('pulou');
     }
 
-    /* ====== ENVIAR PEDIDO WHATSAPP ====== */
-    function enviarPedido() {
-      if (carrinho.length === 0 || carrinho.every(item => item.quantidade === 0)) {
-        alert("Selecione pelo menos um produto!");
-        return;
-      }
+    // ====== DADOS DO PIX (edite aqui se mudar) ======
+    const PIX = {
+      chave: "+5519997154823",        // telefone no formato internacional
+      nome: "JOAO P DA SILVA SANTOS",     // nome do recebedor
+      cidade: "CAMPINAS"               // sua cidade
+    };
+    const numeroWhats = "5519997154823";
 
-      let mensagem = "🍴 Pedido - Delícias Mineiras\n\n";
+    function montarMensagem(nome){
+      let mensagem = "🍴 *Pedido - Uai João!*\n\n";
       let total = 0;
-      carrinho.forEach(item => {
-        if (item.quantidade > 0) {
-          mensagem += `${item.quantidade}x ${item.nome} - R$ ${item.preco.toFixed(2)} cada\n`;
-          total += item.quantidade * item.preco;
+      produtos.forEach((p,i)=>{
+        const q = quantidades[i] || 0;
+        if(q > 0){
+          const sub = q * p.preco;
+          mensagem += `• ${q}x ${p.nome} — R$ ${sub.toFixed(2).replace('.',',')}\n`;
+          total += sub;
         }
       });
-      mensagem += `\n💰 Total: R$ ${total.toFixed(2)}\n\nCliente: [Digite seu nome]`;
-
-      const numeroWhats = "5519997154823";
-      const url = `https://wa.me/${numeroWhats}?text=${encodeURIComponent(mensagem)}`;
-      window.open(url, "_blank");
+      mensagem += `\n💰 *Total: R$ ${total.toFixed(2).replace('.',',')}*\n`;
+      mensagem += `🙋 Cliente: ${nome}`;
+      return { mensagem, total };
     }
+
+    // ====== GERADOR DE PIX (BR Code, padrão Banco Central) ======
+    function crc16(str){
+      let crc = 0xFFFF;
+      for(let i=0;i<str.length;i++){
+        crc ^= str.charCodeAt(i) << 8;
+        for(let j=0;j<8;j++){
+          crc = (crc & 0x8000) ? ((crc << 1) ^ 0x1021) : (crc << 1);
+          crc &= 0xFFFF;
+        }
+      }
+      return crc.toString(16).toUpperCase().padStart(4,'0');
+    }
+    function campoPix(id, valor){
+      return id + valor.length.toString().padStart(2,'0') + valor;
+    }
+    function gerarPix(valor){
+      const mai = campoPix('00','br.gov.bcb.pix') + campoPix('01', PIX.chave);
+      let payload =
+        campoPix('00','01') +
+        campoPix('26', mai) +
+        campoPix('52','0000') +
+        campoPix('53','986') +
+        campoPix('54', valor.toFixed(2)) +
+        campoPix('58','BR') +
+        campoPix('59', PIX.nome.substring(0,25)) +
+        campoPix('60', PIX.cidade.substring(0,15)) +
+        campoPix('62', campoPix('05','***'));
+      payload += '6304';
+      return payload + crc16(payload);
+    }
+
+    let pixCodigoAtual = "";
+    let pedidoPendente = "";
+
+    function enviarPedido(){
+      const temItem = produtos.some((p,i)=>(quantidades[i]||0) > 0);
+      if(!temItem){ alert("Escolha pelo menos um produto para enviar o pedido 🙂"); return; }
+
+      const campo = document.getElementById("campo-nome");
+      const nome = campo.value.trim();
+      if(!nome){
+        alert("Antes de enviar, escreva seu nome ali no campo abaixo 🙂");
+        campo.focus(); return;
+      }
+
+      const { mensagem, total } = montarMensagem(nome);
+      pedidoPendente = mensagem;
+      abrirPix(total);
+    }
+
+    function abrirPix(total){
+      pixCodigoAtual = gerarPix(total);
+      document.getElementById("pix-valor-num").innerText = total.toFixed(2).replace('.',',');
+
+      const box = document.getElementById("qrcode");
+      box.innerHTML = "";
+      new QRCode(box, {
+        text: pixCodigoAtual,
+        width: 200, height: 200,
+        colorDark: "#2a221e", colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.M
+      });
+
+      // reseta o botão copiar
+      document.getElementById("btn-copiar-pix").classList.remove("copiado");
+      document.getElementById("txt-copiar").innerText = "📋 Copiar código Pix";
+
+      document.getElementById("modal-pix").classList.add("aberto");
+    }
+
+    function copiarPix(){
+      navigator.clipboard.writeText(pixCodigoAtual).then(()=>{
+        const btn = document.getElementById("btn-copiar-pix");
+        btn.classList.add("copiado");
+        document.getElementById("txt-copiar").innerText = "✅ Código copiado!";
+      }).catch(()=>{
+        // fallback: seleciona num campo temporário
+        const t = document.createElement("textarea");
+        t.value = pixCodigoAtual; document.body.appendChild(t);
+        t.select(); document.execCommand("copy"); document.body.removeChild(t);
+        document.getElementById("txt-copiar").innerText = "✅ Código copiado!";
+      });
+    }
+
+    function confirmarPagamento(){
+      const msg = pedidoPendente + "\n\n✅ *Já fiz o Pix!*";
+      window.open(`https://wa.me/${numeroWhats}?text=${encodeURIComponent(msg)}`, "_blank");
+      fecharPix();
+    }
+
+    function enviarSemPagar(){
+      const msg = pedidoPendente + "\n\n💬 _Combinar pagamento na entrega_";
+      window.open(`https://wa.me/${numeroWhats}?text=${encodeURIComponent(msg)}`, "_blank");
+      fecharPix();
+    }
+
+    function fecharPix(){
+      document.getElementById("modal-pix").classList.remove("aberto");
+    }
+    // fecha o modal ao tocar fora da caixa
+    document.getElementById("modal-pix").addEventListener("click", function(e){
+      if(e.target === this) fecharPix();
+    });
+
+    filtrarCategoria('Todos', document.querySelector('.categoria-buttons button'));
   </script>
 </body>
 </html>
